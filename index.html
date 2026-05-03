@@ -3469,7 +3469,7 @@ toggleAuthor = function() {
   // Review nav HARUS tetap tampil untuk curator & admin,
   // tidak boleh disembunyikan hanya karena authorMode off
   var reviewNav = document.getElementById('reviewNavItem');
-  var isCuratorOrAdmin = (currentUserRole === 'curator' || currentUserRole === 'admin');
+  var isCuratorOrAdmin = (currentUserRole === 'publis' || currentUserRole === 'kita');
   if (reviewNav) reviewNav.style.display = isCuratorOrAdmin ? 'list-item' : 'none';
 };
 
@@ -4053,7 +4053,7 @@ function renderNavUser(user, profile) {
   var nama = (profile && profile.nama) || user.user_metadata.full_name || user.email.split('@')[0];
   var avatar = user.user_metadata.avatar_url;
   var role = currentUserRole; // sudah lowercase dari setUser
-  var isCuratorOrAdmin = (role === 'curator' || role === 'admin');
+  var isCuratorOrAdmin = (role === 'publis' || role === 'kita');
 
   // Tampilkan review nav untuk curator & admin LANGSUNG (tidak perlu toggle authorMode)
   var ri = document.getElementById('reviewNavItem');
@@ -4071,7 +4071,7 @@ function renderNavUser(user, profile) {
     '<div style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 10px;border-radius:24px;border:1.5px solid rgba(26,107,181,.2);background:#F4F9FF" onclick="showPage(\'profil\')">' +
       (avatar ? '<img src="'+avatar+'" style="width:28px;height:28px;border-radius:50%;object-fit:cover">' : '<div style="width:28px;height:28px;border-radius:50%;background:#1A6BB5;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff">'+nama[0].toUpperCase()+'</div>') +
       '<span style="font-size:13px;font-weight:600;color:#0D2137;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+nama+'</span>' +
-      (isCuratorOrAdmin ? '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:'+(role==='admin'?'#FEF3C7':'#DCEEFB')+';color:'+(role==='admin'?'#92400E':'#1A6BB5')+'">'+(role==='admin'?'Admin':'Kurator')+'</span>' : '') +
+      (isCuratorOrAdmin ? '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:'+(role==='kita'?'#FEF3C7':'#DCEEFB')+';color:'+(role==='kita'?'#92400E':'#1A6BB5')+'">'+(role==='kita'?'Kita':'Publis')+'</span>' : '') +
     '</div>' +
     '<button onclick="logout()" style="font-size:12px;font-weight:600;color:#9CA3AF;background:none;border:none;cursor:pointer;padding:6px 10px;border-radius:8px;transition:all .2s" onmouseover="this.style.color=\'#e53e3e\'" onmouseout="this.style.color=\'#9CA3AF\'">Keluar</button>';
 }
