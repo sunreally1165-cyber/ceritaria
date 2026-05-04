@@ -3426,17 +3426,24 @@ async function kirimNotifikasi() {
     var targetIds = [];
 
     if (notifTarget === 'all') {
-      // Ambil semua user pakai pagination agar tidak timeout
-      var allIds = [], from = 0, batchSize = 1000, done = false;
-      while (!done) {
-        var { data: batch, error: bErr } = await supa.from('users').select('id').range(from, from + batchSize - 1);
-        if (bErr) throw bErr;
-        if (!batch || batch.length === 0) { done = true; break; }
-        batch.forEach(function(u) { allIds.push(u.id); });
-        if (batch.length < batchSize) done = true;
-        from += batchSize;
+      // Kirim broadcast: insert 1 baris dengan user_id = null
+      // Lalu loadNotifications akan tampilkan ke semua user
+      // ATAU: ambil semua user sekali tanpa loop (hindari infinite loop karena RLS)
+      var { data: allUsers, error: allErr } = await supa.from('users').select('id').limit(5000);
+      if (allErr) {
+        // Fallback: kalau RLS blokir query users, coba broadcast insert tanpa user_id spesifik
+        // Insert 1 baris notif broadcast (user_id null) - perlu policy allow null
+        var { error: bcastErr } = await supa.from('notifications').insert([
+          { user_id: null, judul_cerita: judul, pesan: pesan, is_read: false }
+        ]);
+        if (bcastErr) throw new Error('Tidak bisa kirim ke semua user. Pastikan RLS policy users tabel mengizinkan SELECT untuk role curator/admin. Error: ' + allErr.message);
+        statusEl.innerHTML = '<span style="color:#22c55e">Notifikasi broadcast berhasil dikirim!</span>';
+        document.getElementById('notifJudul').value = '';
+        document.getElementById('notifPesan').value = '';
+        setTimeout(function() { if (statusEl) statusEl.innerHTML = ''; }, 5000);
+        return;
       }
-      targetIds = allIds;
+      targetIds = (allUsers || []).map(function(u) { return u.id; });
     } else {
       targetIds = notifSelectedUserIds.slice();
     }
